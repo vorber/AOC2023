@@ -23,29 +23,29 @@ let parseLine (line:string) =
     let actual = toNumbers split[1]
     (winning, actual)
 
-let countPoints line =
+let countWinningNumbers line =
     let (winning, actual) = parseLine line
     actual 
     |> Seq.filter (fun x -> Set.contains x winning)
     |> Seq.length
 
-let points =
+let winningNumbers =
     input 
-    |> Seq.map countPoints
+    |> Seq.map countWinningNumbers
     |> List.ofSeq
 
 //part 1 
 
 let totalPoints = 
-    points
+    winningNumbers
     |> Seq.map (fun c -> if c > 0 then 1 <<< (c-1) else 0)
     |> Seq.sum
 
 printfn "Total points: %i" totalPoints
 //part 2 
 let totalCards = 
-    ([], points |> List.rev)
-    ||> List.fold (fun l p -> (l |> List.truncate p |> List.sum) + 1 :: l)
+    ([], winningNumbers |> List.rev)
+    ||> List.fold (fun l count -> (l |> List.truncate count |> List.sum) + 1 :: l)
     |> List.sum
     
 printfn "Total scratchcards: %i" totalCards
