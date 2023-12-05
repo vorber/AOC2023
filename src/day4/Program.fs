@@ -46,7 +46,7 @@ let points =
     |> Seq.map countPoints
     |> List.ofSeq
 
-let totalCardsReverseAndFold = 
+let totalCards = 
     let ptsRev = 
         points
         |> List.rev
@@ -58,7 +58,7 @@ let totalCardsReverseAndFold =
     ||> List.fold prependSumOfLastXElements
     |> List.sum
     
-printfn "Total scratchcards: %i" totalCardsReverseAndFold
+printfn "Total scratchcards: %i" totalCards
 
 
 
