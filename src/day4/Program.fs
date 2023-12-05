@@ -29,38 +29,24 @@ let countPoints line =
     |> Seq.filter (fun x -> Set.contains x winning)
     |> Seq.length
 
-//part 1 specific
-let part1Points line =
-    let winCount = countPoints line
-    if winCount > 0 then 1 <<< (winCount-1) else 0
-
-let totalPoints = 
-    input
-    |> Seq.map part1Points
-    |> Seq.sum
-
-printfn "Total points: %i" totalPoints
-//part 2 
 let points =
     input 
     |> Seq.map countPoints
     |> List.ofSeq
 
-let totalCards = 
-    let ptsRev = 
-        points
-        |> List.rev
-    let prependSumOfLastXElements l x =
-        let sum = l |> List.truncate x |> List.sum
-        (sum+1)::l
+//part 1 
 
-    ([], ptsRev)
-    ||> List.fold prependSumOfLastXElements
+let totalPoints = 
+    points
+    |> Seq.map (fun c -> if c > 0 then 1 <<< (c-1) else 0)
+    |> Seq.sum
+
+printfn "Total points: %i" totalPoints
+//part 2 
+let totalCards = 
+    ([], points |> List.rev)
+    ||> List.fold (fun l p -> (l |> List.truncate p |> List.sum) + 1 :: l)
     |> List.sum
     
 printfn "Total scratchcards: %i" totalCards
-
-
-
-
 
