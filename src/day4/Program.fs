@@ -40,26 +40,27 @@ let totalPoints =
     |> Seq.sum
 
 printfn "Total points: %i" totalPoints
-//part 2
+//part 2 
 let points =
     input 
     |> Seq.map countPoints
     |> List.ofSeq
 
-type bonus = {Range: int; Increment: int}
-let totalCards = 
-    let decRange (l:bonus list) = 
-        l 
-        |> List.map (fun x -> {Range = x.Range - 1; Increment = x.Increment})
-        |> List.filter (fun x -> x.Range>0)
+let totalCardsReverseAndFold = 
+    let ptsRev = 
+        points
+        |> List.rev
+    let prependSumOfLastXElements l x =
+        let sum = l |> List.truncate x |> List.sum
+        (sum+1)::l
 
-    let rec count acc (bacc:bonus list) (pts:int list) =
-        let bonusCount = bacc |> List.sumBy (fun x -> x.Increment)
-        let increment = 1 + bonusCount
-        let nextbacc pts = if pts = 0 then decRange bacc else {Range = pts; Increment = increment}::(decRange bacc)
-        match pts with
-        | [] -> acc
-        | x::xs -> count (increment+acc) (nextbacc x) xs
-    count 0 [] points
+    ([], ptsRev)
+    ||> List.fold prependSumOfLastXElements
+    |> List.sum
+    
+printfn "Total scratchcards: %i" totalCardsReverseAndFold
 
-printfn "Total scratchcards: %i" totalCards
+
+
+
+
