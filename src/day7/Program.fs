@@ -1,47 +1,27 @@
 ﻿type Card = Card of char
 
-let ordered = "AKQJT98765432*" 
-let orderMap = (ordered, (ordered |> String.length |> Seq.init) (fun x -> x+1) |> Seq.rev) ||> Seq.zip |> Map.ofSeq
+let ordered = "AKQJT98765432*" |> Seq.rev |> Seq.mapi (fun i c -> (c, i+1)) |> Map
 
 let cardOrder (card:Card) = 
     let (Card c) = card
-    orderMap[c]
+    ordered[c]
 
 let compareCards c1 c2 = compare (cardOrder c1) (cardOrder c2)
 
 type Hand = Hand of Card seq
 
-let (|FiveOfAKind|FourOfAKind|FullHouse|ThreeOfAKind|TwoPairs|OnePair|HighCard|) hand =
-    let (Hand cards) = hand
-    let wildcards = cards |> Seq.filter (fun c -> c = Card '*') |> Seq.length
-    let uniqueCount = cards |> Seq.countBy id |> Seq.map snd |> Seq.sortDescending |> List.ofSeq
-    match (uniqueCount, wildcards) with
-    | ([5], _) -> FiveOfAKind
-    | ([4; 1], 1) -> FiveOfAKind
-    | ([4; 1], 4) -> FiveOfAKind
-    | ([4; 1], 0) -> FourOfAKind
-    | ([3; 2], 0) -> FullHouse
-    | ([3; 2], _) -> FiveOfAKind
-    | ([3; 1; 1], 0) -> ThreeOfAKind
-    | ([3; 1; 1], _) -> FourOfAKind
-    | ([2; 2; 1], 0) -> TwoPairs
-    | ([2; 2; 1], 1) -> FullHouse
-    | ([2; 2; 1], 2) -> FourOfAKind
-    | ([2; 1; 1; 1], 0) -> OnePair
-    | ([2; 1; 1; 1], _) -> ThreeOfAKind
-    | ([1; 1; 1; 1; 1], 1) -> OnePair
-    | ([1; 1; 1; 1; 1], 0) -> HighCard
-    | _ -> failwith "invalid hand"
-
 let handTypeOrder hand =
-    match hand with
-    | HighCard -> 0
-    | OnePair -> 1
-    | TwoPairs -> 2
-    | ThreeOfAKind -> 3
-    | FullHouse -> 4
-    | FourOfAKind -> 5
-    | FiveOfAKind -> 6
+    let (Hand cards) = hand
+    let withoutJokers = cards |> Seq.filter (fun c -> c <> Card '*')
+    let counts = withoutJokers |> Seq.countBy id |> Seq.map snd |> Seq.sortDescending |> List.ofSeq
+    match counts with
+    | [5] | [4] | [3] | [2] | [1] | []  -> 6
+    | [4; 1] | [3; 1] | [2; 1] | [1; 1] -> 5
+    | [3; 2] | [2; 2]                   -> 4
+    | [3; 1; 1] | [2; 1; 1] | [1; 1; 1] -> 3
+    | [2; 2; 1]                         -> 2
+    | [2; 1; 1; 1;] | [1; 1; 1; 1]      -> 1
+    | _                                 -> 0
 
 let compareHands (Hand h1) (Hand h2) =
     let c = compare (handTypeOrder (Hand h1)) (handTypeOrder (Hand h2))
