@@ -1,30 +1,22 @@
 ﻿type Card = Card of char
 
-let ordered = "AKQJT98765432*" |> Seq.rev |> Seq.mapi (fun i c -> (c, i+1)) |> Map
-
-let cardOrder (card:Card) = 
-    let (Card c) = card
-    ordered[c]
+let cardOrder (Card c) = "AKQJT98765432*" |> Seq.rev |> Seq.mapi (fun i c -> (c, i+1)) |> Map |> Map.find c
 
 let compareCards c1 c2 = compare (cardOrder c1) (cardOrder c2)
 
 type Hand = Hand of Card seq
 
-let handTypeOrder hand =
-    let (Hand cards) = hand
-    let withoutJokers = cards |> Seq.filter (fun c -> c <> Card '*')
-    let counts = withoutJokers |> Seq.countBy id |> Seq.map snd |> Seq.sortDescending |> List.ofSeq
-    match counts with
-    | [5] | [4] | [3] | [2] | [1] | []  -> 6
-    | [4; 1] | [3; 1] | [2; 1] | [1; 1] -> 5
-    | [3; 2] | [2; 2]                   -> 4
-    | [3; 1; 1] | [2; 1; 1] | [1; 1; 1] -> 3
-    | [2; 2; 1]                         -> 2
-    | [2; 1; 1; 1;] | [1; 1; 1; 1]      -> 1
-    | _                                 -> 0
+let handTypeOrder cards =
+    let cnt = cards |> Seq.filter (fun c -> c <> Card '*') |> Seq.countBy id |> Seq.map snd |> Seq.sortDescending //|> List.ofSeq
+    match cnt |> Seq.length, cnt |> Seq.sum with
+    | (0, _) | (1, _)   -> 6
+    | (2, x)            -> cnt |> Seq.head |> (+) (6-x)
+    | (3, x)            -> cnt |> Seq.head |> (+) (5-x)
+    | (4, _)            -> 1
+    | _                 -> 0
 
 let compareHands (Hand h1) (Hand h2) =
-    let c = compare (handTypeOrder (Hand h1)) (handTypeOrder (Hand h2))
+    let c = compare (handTypeOrder h1) (handTypeOrder h2)
     if c <> 0 then c else
        (h1, h2) ||> Seq.compareWith compareCards
 
