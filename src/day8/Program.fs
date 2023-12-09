@@ -18,17 +18,17 @@ let parseInput =
     let g (m:Match) (group:string) = m.Groups[group].Value
     let parsePath = Seq.head >> Seq.map dir
     let parseNode = lineRx.Match >> fun m -> {Name = g m "name"; Left = g m "left"; Right = g m "right"}
-    let parseNodes = Seq.tail >> Seq.tail >> Seq.map parseNode >> Seq.map (fun n -> (n.Name, n)) >> Map
+    let parseNodes = Seq.skip 2 >> Seq.map parseNode >> Seq.map (fun n -> (n.Name, n)) >> Map
     applyBoth parsePath parseNodes
 
 let (path, nodes) = parseInput input
 
-let runWhile condition (path, start) = 
+let runUntil condition (path, start) = 
     let move node dir = match dir with | Left -> nodes[node.Left] | Right -> nodes[node.Right]
-    (start, path) ||> Seq.scan move |> (Seq.takeWhile condition) |> Seq.length |> int64
+    (start, path) ||> Seq.scan move |> (Seq.takeWhile (condition >> not)) |> Seq.length |> int64
 
 let rec repeat xs =  seq { yield! xs; yield! repeat xs}
-let p1 = ((repeat path), nodes["AAA"]) |> runWhile ((<>) nodes["ZZZ"])
+let p1 = ((repeat path), nodes["AAA"]) |> runUntil ((=) nodes["ZZZ"])
 printfn "P1: %i" p1
 
 let isStart (name:string) _ = name[2] = 'A'
@@ -37,9 +37,8 @@ let isTerminal node = node.Name[2] = 'Z'
 let startingNodes = Map.filter isStart >> Map.values
 
 let tupleWith x y = (x, y)
-let uncurry f (x, y) = f x y
 
-let cycleLen = (tupleWith (repeat path)) >> runWhile (isTerminal >> not)
+let cycleLen = (tupleWith (repeat path)) >> runUntil isTerminal
 
 let rec gcd a b = match a, b with
                     | (x, 0L) -> x
