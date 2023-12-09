@@ -37,6 +37,7 @@ let isTerminal node = node.Name[2] = 'Z'
 let startingNodes = Map.filter isStart >> Map.values
 
 let tupleWith x y = (x, y)
+let uncurry f (x, y) = f x y
 
 let cycleLen = (tupleWith (repeat path)) >> runWhile (isTerminal >> not)
 
@@ -46,6 +47,6 @@ let rec gcd a b = match a, b with
                     | (x, y) -> gcd y (x % y)
 let lcm a b = a * b / (gcd a b)
 
-let part2 = startingNodes >> Seq.map cycleLen >> Seq.fold lcm 1L
+let part2 = startingNodes >> Seq.map cycleLen >> Seq.reduce lcm 
 
 printfn "P2: %i" (part2 nodes)
