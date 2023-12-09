@@ -23,12 +23,12 @@ let parseInput =
 
 let (path, nodes) = parseInput input
 
-let cycleWhile condition (path, start) = 
+let runWhile condition (path, start) = 
     let move node dir = match dir with | Left -> nodes[node.Left] | Right -> nodes[node.Right]
     (start, path) ||> Seq.scan move |> (Seq.takeWhile condition) |> Seq.length |> int64
 
 let rec repeat xs =  seq { yield! xs; yield! repeat xs}
-let p1 = ((repeat path), nodes["AAA"]) |> cycleWhile ((<>) nodes["ZZZ"])
+let p1 = ((repeat path), nodes["AAA"]) |> runWhile ((<>) nodes["ZZZ"])
 printfn "P1: %i" p1
 
 let isStart (name:string) _ = name[2] = 'A'
@@ -38,7 +38,7 @@ let startingNodes = Map.filter isStart >> Map.values
 
 let tupleWith x y = (x, y)
 
-let cycleLen = (tupleWith (repeat path)) >> cycleWhile (isTerminal >> not)
+let cycleLen = (tupleWith (repeat path)) >> runWhile (isTerminal >> not)
 
 let rec gcd a b = match a, b with
                     | (x, 0L) -> x
