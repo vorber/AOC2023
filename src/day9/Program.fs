@@ -7,7 +7,7 @@ let predict folder =
     Array.unfold generator >> flipLastArgs (Array.foldBack (folder)) 0
 
 let parseLine = splitOn " " >> Array.map int 
-let folder = flipLastArgs Array.get 1 >> (-)
+let folder = flipLastArgs Array.get 0 >> (-)
 let part1 = Seq.map (Array.rev >> predict folder) >> Seq.sum
 let part2 = Seq.map (predict folder) >> Seq.sum
 let r1,r2 = AOC.Inputs.load "2023" "9" |> Async.RunSynchronously |> Seq.map parseLine|> applyBoth part1 part2
