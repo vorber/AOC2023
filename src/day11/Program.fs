@@ -1,5 +1,4 @@
 ﻿open AOC.Misc
-
 let expansions =
     let isEmpty = Seq.forall ((=) '.')
     let rowsToExpand = Seq.mapi (fun i l -> if isEmpty l then Some (int64 i) else None) >> Seq.choose id
