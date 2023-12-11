@@ -39,7 +39,9 @@ let flow grid start direction =
         (Map.tryFind next grid) |> Option.bind nextMove
     Seq.unfold (nextMoveGenerator grid) (start, direction) 
 
-let path (grid, start)= 
+let path (grid, start) = 
+    //this is somewhat cheating, since technically there can be a longer path that doesn't loop
+    //also going through the loop twice, in both directions. TODO: improve
     let withoutStart = [Up; Down; Left; Right] |> List.map (flow grid start) |> List.maxBy Seq.length
     seq { yield start; yield! withoutStart; yield start; }
 
@@ -50,7 +52,7 @@ let area = Seq.pairwise >> Seq.fold (fun s ((x1, y1), (x2, y2)) -> s + x1*y2 - x
 let part1 = Seq.length >> half
 let part2 path = 
     let (a, p1) = (applyBoth area part1) path
-    a - p1 + 1
+    a - p1 + 1 //magic :P
     
 let solution = parseInput >> path >> applyBoth part1 part2
 let (p1, p2) = AOC.Inputs.load "2023" "10" |> Async.RunSynchronously |> solution
