@@ -47,6 +47,7 @@ let path (grid, start) =
 
 let half = flipLastArgs (/) 2
 
+//this can also be optimized, since on each single step difference in one direction is 0 and in another +-1
 let area = Seq.pairwise >> Seq.fold (fun s ((x1, y1), (x2, y2)) -> s + x1*y2 - x2*y1 ) 0  >> abs >> half
 
 let part1 = Seq.length >> half
