@@ -7,20 +7,21 @@ let rec arrange =
         else match s |> List.skip g |> List.tryHead with
                 | Some '#' -> false
                 | _ -> true
-    memoize (fun (pat, grp) ->
-    match pat, grp with
-    | [], [] -> 1L
-    | [], _ -> 0L
-    | p, [] -> if p |> List.forall((<>) '#') then 1L else 0L
-    | p::ps, g::gs -> 
-        let ret = 
-            match p with
-            | '.' -> arrange (ps, g::gs)
-            | '?' -> (arrange (ps, g::gs)) + (arrange ('#'::ps, g::gs))
-            | '#' -> 
-                if matches (p::ps) g then arrange (ps |> safeSkip g |> List.ofSeq, gs) else 0L
-            | _ -> failwith "unexpected character"
-        ret)
+    memoize 
+        (fun (pat, grp) ->
+            match pat, grp with
+            | [], [] -> 1L
+            | [], _ -> 0L
+            | p, [] -> if p |> List.forall((<>) '#') then 1L else 0L
+            | p::ps, g::gs -> 
+                let ret = 
+                    match p with
+                    | '.' -> arrange (ps, g::gs)
+                    | '?' -> (arrange (ps, g::gs)) + (arrange ('#'::ps, g::gs))
+                    | '#' -> 
+                        if matches (p::ps) g then arrange (ps |> safeSkip g |> List.ofSeq, gs) else 0L
+                    | _ -> failwith "unexpected character"
+                ret)
 
 let replicate n =
     let replPattern n =
