@@ -40,11 +40,7 @@ let part2 platform =
         tp0 >> run Map.empty
 
     let (start, len, cache) = findPeriod platform
-    let n = start + (1000000000 - start) % len 
-    cache 
-        |> Map.tryFindKey (fun _ i -> i = n)
-        |> Option.get
-        |> platformWeight 
+    cache |> Map.findKey (fun _ i -> i = start + (1000000000 - start) % len) |> platformWeight 
 
 let (r1, r2) = AOC.Inputs.load "2023" "14" |> Async.RunSynchronously |> parse |> applyBoth part1 part2
 printfn "P1: %A" r1
