@@ -8,6 +8,7 @@ module Misc =
     let tuple (arr:'a array) = (arr[0], arr[1])
     let tmap f (a,b) = (f a, f b)
     let tmap2 f g (a, b) = (f a, g b)
+
     let memoize f =
         let cache = Dictionary<_, _>();
         fun c ->
@@ -17,3 +18,16 @@ module Misc =
                 let value = f c
                 cache.Add(c, value)
                 value
+
+    let splitWhen (predicate: 'a -> bool) (lines: 'a list) =
+        let split l (a, t) =
+            if predicate l then ([], a::t)
+            else (l::a, t)
+        List.foldBack split lines ([], []) |> fun (a, t) -> a::t
+
+    let countBits64 n =
+        let rec count acc n =
+            match n with
+            | 0L -> acc
+            | x -> count (acc+1) (x &&& (x-1L))
+        count 0 n
