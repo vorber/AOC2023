@@ -19,11 +19,17 @@ module Misc =
                 cache.Add(c, value)
                 value
 
-    let splitWhen (predicate: 'a -> bool) (lines: 'a list) =
+    let splitWhen (predicate: 'a -> bool) (elements: 'a list) =
         let split l (a, t) =
             if predicate l then ([], a::t)
             else (l::a, t)
-        List.foldBack split lines ([], []) |> fun (a, t) -> a::t
+        List.foldBack split elements ([], []) |> fun (a, t) -> a::t
+
+    let splitBefore (predicate: 'a -> bool) (elements: 'a list) =
+        let split l (a, t) =
+            if predicate l then ([], (l::a)::t)
+            else (l::a, t)
+        List.foldBack split elements ([], []) |> fun (a, t) -> a::t
 
     let countBits64 n =
         let rec count acc n =
