@@ -29,7 +29,7 @@ let tiltPlatform dir = rotate dir Forward >> List.map tilt >> rotate dir Back
 
 let part1 = tiltPlatform North >> platformWeight
 
-let part2 platform = 
+let part2 = 
     let cycle = [North; West; South; East] |> List.map tiltPlatform |> List.fold (>>) id
     let findPeriod =
         let tp0 x = (0, x)
@@ -38,9 +38,9 @@ let part2 platform =
             | None -> run (Map.add platform i cache) (i+1, cycle platform)
             | Some start -> (start, i - start, cache)
         tp0 >> run Map.empty
+    let finalPlatformState (ps, pl, cache) = Map.findKey (fun _ i -> i = ps + (1000000000 - ps) % pl) cache
 
-    let (start, len, cache) = findPeriod platform
-    cache |> Map.findKey (fun _ i -> i = start + (1000000000 - start) % len) |> platformWeight 
+    findPeriod >> finalPlatformState >> platformWeight
 
 let (r1, r2) = AOC.Inputs.load "2023" "14" |> Async.RunSynchronously |> parse |> applyBoth part1 part2
 printfn "P1: %A" r1
