@@ -11,7 +11,7 @@ let parseCell c =
     | '.' -> Empty
     | _ -> failwith "unexpected"
 
-let parse = Seq.map (Seq.map parseCell >> List.ofSeq) >> List.ofSeq
+let parseInput = Seq.map (Seq.map parseCell >> List.ofSeq) >> List.ofSeq
 
 let rotate tdir rdir =
     match rdir, tdir with
@@ -42,6 +42,6 @@ let part2 =
 
     findPeriod >> finalPlatformState >> platformWeight
 
-let (r1, r2) = AOC.Inputs.load "2023" "14" |> Async.RunSynchronously |> parse |> applyBoth part1 part2
+let (r1, r2) = AOC.Inputs.load "2023" "14" |> Async.RunSynchronously |> parseInput |> applyBoth part1 part2
 printfn "P1: %A" r1
 printfn "P2: %A" r2
