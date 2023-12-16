@@ -1,4 +1,5 @@
 ﻿open AOC.Misc
+
 let flip = flipLastArgs
 
 type Direction = U | D | L | R
@@ -9,52 +10,56 @@ let move ((x,y), dir) =
     | L -> ((x-1, y), dir)
     | R -> ((x+1, y), dir)
 
-let interact (m:Map<int*int, char>) (pos, dir) =
+let parseInput = 
+    let makeGrid = Array.map (Array.ofSeq)
+    let size = applyBoth (Seq.head >> String.length) Seq.length
+    applyBoth makeGrid size
+
+let (grid, size) = AOC.Inputs.load "2023" "16" |> Async.RunSynchronously |> parseInput
+let inside (x,y) = (x >= 0) && (x < fst size) && (y>=0) && (y < snd size)
+
+let interact ((x,y), dir) =
     let changeDirection c = 
         match c, dir with
-        | '.', d -> [d;]
-        | '|', d when d = U || d = D -> [d;]
-        | '|', d when d = L || d = R -> [U;D;]
-        | '-', d when d = U || d = D -> [R;L;]
-        | '-', d when d = L || d = R -> [d;]
-        | '\\', U | '/', D -> [L;]
-        | '\\', D | '/', U -> [R;]
-        | '\\', L | '/', R -> [U;]
-        | '\\', R | '/', L -> [D;]
+        | '.', d -> Set.empty.Add(d) 
+        | '|', d when d = U || d = D -> Set.empty.Add(d)
+        | '|', d when d = L || d = R -> Set.empty.Add(U).Add(D)
+        | '-', d when d = U || d = D -> Set.empty.Add(R).Add(L)
+        | '-', d when d = L || d = R -> Set.empty.Add(d)
+        | '\\', U | '/', D -> Set.empty.Add(L)
+        | '\\', D | '/', U -> Set.empty.Add(R)
+        | '\\', L | '/', R -> Set.empty.Add(U)
+        | '\\', R | '/', L -> Set.empty.Add(D)
         | _ -> failwith "unexpected"
-    match m.TryFind(pos) with
-    | None -> []
-    | Some c -> changeDirection c
-    |> List.map (fun d -> (pos, d))
-    |> Set.ofList
+    if inside (x,y) then (grid[y][x]) |> changeDirection |> Set.map (fun d -> ((x,y), d)) else Set.empty
 
-type NodeSet = Set<(int*int)*Direction>
-let traceBFS grid (start, direction) =
-    let rec trace visited ps =
-        let next = Set.map (interact grid) >> Set.unionMany >> Set.map move >> Set.filter (fst >> grid.ContainsKey)
-        match (next ps) - visited with
-        | s when Set.isEmpty s -> visited
-        | s -> trace (visited + s) s
-    trace (Set.empty.Add (start, direction)) (Set.empty.Add (start, direction))
+let energize (pos, dir) =
+    Seq.unfold 
+        (fun (visited, ps) -> 
+            match ps with 
+            | p when Set.isEmpty p -> None
+            | p -> 
+                let next = Set.map interact >> Set.unionMany >> Set.map move >> Set.filter (fst >> inside)
+                let ps' = (next p) - visited
+                let visited' = visited + ps'
+                Some (visited', (visited', ps')))
+        (Set.empty.Add (pos, dir), Set.empty.Add (pos, dir))
+    |> Seq.last
+    |> Set.map fst
+    |> Set.count
 
-let energizedCount grid = traceBFS grid >> Set.map fst >> Set.count
+let part1 = energize ((0,0),R)
 
-let parseInput = Seq.mapi (fun y l -> l |> Seq.mapi (fun x c -> ((x, y), c))) >> Seq.concat >> Map
+printfn "%A" part1
 
-let solveP1 = parseInput >> energizedCount
-let part1 i = i |> solveP1 <| ((0,0),R)
-let part2 i = 
-    let grid = parseInput i
-    let h = i |> Seq.length
-    let w = i |> Seq.head |> String.length
+let part2 = 
+    let (w, h) = size
     let top = [1..w-1] |> List.map (fun x -> ((x,0), D))
     let bottom = [1..w-1] |> List.map (fun x -> ((x,w-1), U))
     let left = [1..h-1] |> List.map (fun x -> ((x,0), R))
     let right = [1..h-1] |> List.map (fun x -> ((x,h-1), L))
-    let best = [top; bottom; left; right] |> List.map (List.map (energizedCount grid) >> List.max) |> List.max
+    let best = [top; bottom; left; right] |> List.map (List.map energize >> List.max) |> List.max
     best
 
-let (r1, r2) = AOC.Inputs.load "2023" "16" |> Async.RunSynchronously |> applyBoth part1 part2
-printfn "%A" r1
-printfn "%A" r2
+printfn "%A" part2 
 
