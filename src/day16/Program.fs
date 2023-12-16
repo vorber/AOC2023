@@ -54,11 +54,11 @@ printfn "%A" part1
 
 let part2 = 
     let (w, h) = size
-    let top = [1..w-1] |> List.map (fun x -> ((x,0), D))
-    let bottom = [1..w-1] |> List.map (fun x -> ((x,w-1), U))
-    let left = [1..h-1] |> List.map (fun x -> ((x,0), R))
-    let right = [1..h-1] |> List.map (fun x -> ((x,h-1), L))
-    let best = [top; bottom; left; right] |> List.map (List.map energize >> List.max) |> List.max
+    let top = [|1..w-1|] |> Array.map (fun x -> ((x,0), D))
+    let bottom = [|1..w-1|] |> Array.map (fun x -> ((x,w-1), U))
+    let left = [|1..h-1|] |> Array.map (fun x -> ((x,0), R))
+    let right = [|1..h-1|] |> Array.map (fun x -> ((x,h-1), L))
+    let best = [|top; bottom; left; right|] |> Array.Parallel.map (Array.Parallel.map energize >> Array.max) |> Array.max
     best
 
 printfn "%A" part2 
