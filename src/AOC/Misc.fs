@@ -37,3 +37,35 @@ module Misc =
             | 0L -> acc
             | x -> count (acc+1) (x &&& (x-1L))
         count 0 n
+
+    type Direction = 
+        Up | Down | Left | Right
+        member this.rev = match this with | Up -> Down | Down -> Up | Left -> Right | Right -> Left
+        static member parse s = 
+            match s with 
+            | "U" -> Up
+            | "D" -> Down
+            | "L" -> Left
+            | "R" -> Right
+            | unexpected -> failwithf "unexpected input %s" unexpected
+
+        member this.moveBig (distance:bigint) (x,y) =
+            match this with
+            | Up -> (x, y-distance)
+            | Down -> (x, y+distance)
+            | Left -> (x-distance, y)
+            | Right -> (x+distance, y)
+            
+        member this.move64 (distance:int64) (x,y) =
+            match this with
+            | Up -> (x, y-distance)
+            | Down -> (x, y+distance)
+            | Left -> (x-distance, y)
+            | Right -> (x+distance, y)
+
+        member this.move distance (x,y) =
+            match this with
+            | Up -> (x, y-distance)
+            | Down -> (x, y+distance)
+            | Left -> (x-distance, y)
+            | Right -> (x+distance, y)

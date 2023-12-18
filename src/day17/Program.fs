@@ -1,7 +1,6 @@
 ﻿open AOC.Misc
 
-type Direction = U | D | L | R
-let rev d = match d with | U -> D | D -> U | L -> R | R -> L
+
 type Vertex = {Pos: int*int; Dir: Direction; StepsTaken: int}
 
 let parse = 
@@ -14,27 +13,21 @@ let input = AOC.Inputs.load "2023" "17" |> Async.RunSynchronously
 let (grid, size) = input |> parse
 printfn "Size: %A" size
 
-let step dir (x,y) =
-    match dir with
-    | U -> (x, y-1)
-    | D -> (x, y+1)
-    | L -> (x-1, y)
-    | R -> (x+1, y)
-let move v dir = {Dir = dir; Pos = step dir v.Pos; StepsTaken = if dir = v.Dir then v.StepsTaken + 1  else 1}
+let move v dir = {Dir = dir; Pos = dir.move 1 v.Pos; StepsTaken = if dir = v.Dir then v.StepsTaken + 1  else 1}
 
 let inside (width, height) v = (fst v.Pos >= 0) && (fst v.Pos < width) && (snd v.Pos>=0) && (snd v.Pos < height) 
 
 let validate sz v = List.map (move v) >> List.filter (inside sz) 
 
 let neighbours_p1 sz v = 
-    [U;D;L;R] 
-    |> List.filter (fun dir -> dir <> rev v.Dir && (v.StepsTaken < 3 || v.Dir <> dir))
+    [Up;Down;Left;Right] 
+    |> List.filter (fun dir -> dir <> v.Dir.rev && (v.StepsTaken < 3 || v.Dir <> dir))
     |> validate sz v
 
 let neighbours_p2 sz v = 
     let possibleDirections = 
         if v.StepsTaken > 0 && v.StepsTaken < 4 then [v.Dir]
-        else [U;D;L;R] |> List.filter (fun dir -> dir <> rev v.Dir && (dir <> v.Dir || v.StepsTaken < 10))
+        else [Up;Down;Left;Right] |> List.filter (fun dir -> dir <> v.Dir.rev && (dir <> v.Dir || v.StepsTaken < 10))
     possibleDirections 
     |> validate sz v
 
@@ -62,7 +55,7 @@ let dijkstra (g:int array array) sz nfun start stepsLeft donefun =
                             ) (q', visited)
             loop queue' visited' 
 
-    loop (Set.singleton (0, {Dir = R; Pos=start; StepsTaken=stepsLeft})) Map.empty
+    loop (Set.singleton (0, {Dir = Right; Pos=start; StepsTaken=stepsLeft})) Map.empty
 
 let reachedFinalP1 v = (fst v.Pos) = (fst size)-1 && (snd v.Pos) = (snd size)-1
 let reachedFinalP2 v = v.StepsTaken >=4 && reachedFinalP1 v
