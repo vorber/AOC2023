@@ -67,7 +67,7 @@ let dijkstra (g:int array array) sz nfun start stepsLeft donefun =
 let reachedFinalP1 v = (fst v.Pos) = (fst size)-1 && (snd v.Pos) = (snd size)-1
 let reachedFinalP2 v = v.StepsTaken >=4 && reachedFinalP1 v
 
-let part1 (grid, size) = dijkstra grid size neighbours_p1 (0,0) 3 reachedFinalP1
+let part1 (grid, size) = dijkstra grid size neighbours_p1 (0,0) 0 reachedFinalP1
 let part2 (grid, size) = dijkstra grid size neighbours_p2 (0,0) 0 reachedFinalP2
 let (r1, r2) = input |> parse |> applyBoth part1 part2
 printfn "%A" r1
