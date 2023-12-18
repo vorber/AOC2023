@@ -49,20 +49,6 @@ module Misc =
             | "R" -> Right
             | unexpected -> failwithf "unexpected input %s" unexpected
 
-        member this.moveBig (distance:bigint) (x,y) =
-            match this with
-            | Up -> (x, y-distance)
-            | Down -> (x, y+distance)
-            | Left -> (x-distance, y)
-            | Right -> (x+distance, y)
-            
-        member this.move64 (distance:int64) (x,y) =
-            match this with
-            | Up -> (x, y-distance)
-            | Down -> (x, y+distance)
-            | Left -> (x-distance, y)
-            | Right -> (x+distance, y)
-
         member this.move distance (x,y) =
             match this with
             | Up -> (x, y-distance)
