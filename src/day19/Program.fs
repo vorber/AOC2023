@@ -80,18 +80,20 @@ let rec accepted (workflows:Map<string, Rule seq>) (range, rules) =
             (acc'@acc, next')
     (([], Some range), rules) ||> Seq.fold folder |> fst
 
-let part1 workflows = 
-    Seq.map toRange 
-    >> Seq.collect (fun r -> accepted workflows (r, workflows["in"])) 
-    >> Seq.sumBy (fun r -> fst r.X + fst r.M + fst r.A + fst r.S)
+let part1 (workflows, ratings) = 
+    let solve = 
+        Seq.map toRange 
+        >> Seq.collect (fun r -> accepted workflows (r, workflows["in"])) 
+        >> Seq.sumBy (fun r -> fst r.X + fst r.M + fst r.A + fst r.S)
+    solve ratings
     
-let part2 (workflows: Map<string, Rule seq>) = 
+let part2 (workflows, _) = 
     let rangeSize r =
         let d (l:int,h:int) = bigint h - bigint l + 1I
         (d r.X)*(d r.M)*(d r.A)*(d r.S)
-    accepted workflows >> Seq.sumBy rangeSize
+    let solve = accepted workflows >> Seq.sumBy rangeSize
+    solve ({RatingRange.X = (1,4000); M = (1,4000); A = (1,4000); S = (1,4000)}, workflows["in"]) 
 
-let (workflows, ratings) = AOC.Inputs.load "2023" "19" |> Async.RunSynchronously |> List.ofSeq |> parse
-ratings |> part1 workflows |> (printfn "%A")
-({RatingRange.X = (1,4000); M = (1,4000); A = (1,4000); S = (1,4000)}, workflows["in"]) |> (part2 workflows) |> printfn "%A"
-
+let (r1, r2) = AOC.Inputs.load "2023" "19" |> Async.RunSynchronously |> List.ofSeq |> parse |> applyBoth part1 part2
+printfn "Part1: %A" r1
+printfn "Part2: %A" r2
