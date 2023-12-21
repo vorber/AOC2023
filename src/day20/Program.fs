@@ -117,12 +117,12 @@ let p1 modules =
 let p2 modules = 
     let rxModulePredecessor: Map<Label, Module> -> Module = 
         Map.values >> Seq.filter (_.Destinations >> List.contains (Label "rx")) >> Seq.exactlyOne
-    let predLabels = match (rxModulePredecessor modules) with
-                     | Conjunction c -> c.SourcePulses |> Map.keys 
-                     | _ -> failwith "should not happen, ever :P"
+    let predSources = match (rxModulePredecessor modules) with
+                        | Conjunction c -> c.SourcePulses |> Map.keys 
+                        | _ -> failwith "should not happen, ever :P"
     let receivedLowPulse label = fun (_, _, pulses) -> pulses |> Seq.exists (fun p -> p.Destination = label && p.Type = Low)
     let pushesToReceiveLowPulse label = pushButton modules (receivedLowPulse label) |> snd |> Seq.last
-    let periods = predLabels |> Seq.map (pushesToReceiveLowPulse >> bigint)
+    let periods = predSources |> Seq.map (pushesToReceiveLowPulse >> bigint)
     let lcm a b = a * b / bigint.GreatestCommonDivisor(a,b)
     in
     periods |> Seq.reduce lcm 
