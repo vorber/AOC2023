@@ -24,7 +24,7 @@ let p2 (grid:char [][], (w, h)) =
     let c = steps |> crossings |> Seq.take 3 |> Seq.map (Set.count >> int64) |> Seq.toArray
     let n = 26501365L / int64 w
     c[0] + n * (c[1]-c[0]) + (n * (n-1L) / 2L) * ((c[2]-c[1]) - (c[1]-c[0]))
-    
+
 let (r1, r2) = AOC.Inputs.load "2023" "21" |> Async.RunSynchronously |> parseInput |> applyBoth p1 p2
 printfn "%A" r1
 printfn "%A" r2

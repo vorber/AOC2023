@@ -5,7 +5,9 @@ module Misc =
     let splitOn (split:string) (str:string) = str.Split(split)
     let safeSkip count = Seq.indexed >> Seq.filter (fst >> (<=) count) >> Seq.map snd
     let flipLastArgs f a b = f b a
+    let flip f a b = f b a
     let tuple (arr:'a array) = (arr[0], arr[1])
+    let triple (arr:'a array) = (arr[0], arr[1], arr[2])
     let tmap f (a,b) = (f a, f b)
     let tmap2 f g (a, b) = (f a, g b)
 
@@ -55,3 +57,6 @@ module Misc =
             | Down -> (x, y+distance)
             | Left -> (x-distance, y)
             | Right -> (x+distance, y)
+
+    module Set =
+        let isNonEmptySubset s1 s2 = not (Set.isEmpty s1) && Set.isSubset s1 s2 
