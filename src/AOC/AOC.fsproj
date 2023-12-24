@@ -8,6 +8,7 @@
   <ItemGroup>
     <Compile Include="Inputs.fs" />
     <Compile Include="Misc.fs" />
+    <Compile Include="Graph.fs" />
   </ItemGroup>
 
   <ItemGroup>

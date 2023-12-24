@@ -10,6 +10,10 @@ module Misc =
     let triple (arr:'a array) = (arr[0], arr[1], arr[2])
     let tmap f (a,b) = (f a, f b)
     let tmap2 f g (a, b) = (f a, g b)
+    let Const a _ = a
+    let uncurry f (a, b) = f a b
+    let curry f a b = f (a, b)
+    let (<&>) f g x = f x && g x
 
     let memoize f =
         let cache = Dictionary<_, _>();
@@ -42,7 +46,15 @@ module Misc =
 
     type Direction = 
         Up | Down | Left | Right
+        
+        member this.tuple = 
+            match this with
+            | Up -> (0, -1)
+            | Down -> (0, 1)
+            | Left -> (-1, 0)
+            | Right -> (1, 0)
         member this.rev = match this with | Up -> Down | Down -> Up | Left -> Right | Right -> Left
+
         static member parse s = 
             match s with 
             | "U" -> Up
@@ -51,12 +63,14 @@ module Misc =
             | "R" -> Right
             | unexpected -> failwithf "unexpected input %s" unexpected
 
-        member this.move distance (x,y) =
-            match this with
+        static member move (x, y) distance dir =
+            match dir with
             | Up -> (x, y-distance)
             | Down -> (x, y+distance)
             | Left -> (x-distance, y)
             | Right -> (x+distance, y)
+
+        static member all = [Up; Down; Left; Right]
 
     module Set =
         let isNonEmptySubset s1 s2 = not (Set.isEmpty s1) && Set.isSubset s1 s2 
