@@ -78,4 +78,4 @@ module Misc =
         let (|Empty|NonEmpty|) s = if Set.isEmpty s then Empty else NonEmpty s
 
     module Map =
-        let tryFind2 k1 k2 (m:Map<'a, Map<'b, 'c>>) = Map.tryFind k1 m |> Option.bind (Map.tryFind k2)
+        let tryFind2 k1 k2 = Map.tryFind k1  >> Option.bind (Map.tryFind k2)
