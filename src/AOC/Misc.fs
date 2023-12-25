@@ -8,6 +8,7 @@ module Misc =
     let flip f a b = f b a
     let tuple (arr:'a array) = (arr[0], arr[1])
     let triple (arr:'a array) = (arr[0], arr[1], arr[2])
+    let dup x = (x,x)
     let tmap f (a,b) = (f a, f b)
     let tmap2 f g (a, b) = (f a, g b)
     let Const a _ = a
@@ -74,3 +75,7 @@ module Misc =
 
     module Set =
         let isNonEmptySubset s1 s2 = not (Set.isEmpty s1) && Set.isSubset s1 s2 
+        let (|Empty|NonEmpty|) s = if Set.isEmpty s then Empty else NonEmpty s
+
+    module Map =
+        let tryFind2 k1 k2 (m:Map<'a, Map<'b, 'c>>) = Map.tryFind k1 m |> Option.bind (Map.tryFind k2)
